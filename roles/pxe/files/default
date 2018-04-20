@@ -1,0 +1,19 @@
+DEFAULT menu.c32
+PROMPT 0
+TIMEOUT 50
+
+MENU title ########## PXE Boot Menu ##########
+LABEL CenrtOS 7
+MENU DEFAULT
+MENU LABEL Install CentOS 7.0 x86_64 Minimal
+KERNEL images/vmlinuz
+APPEND initrd=images/initrd.img ramdisk_size=100000 ip=dhcp inst.repo=ftp://192.168.142.108/pub
+
+# ks=tftp://192.168.142.1/images/c7.ks
+
+LABEL CentOS 7 x86_64 Minimal Rescue
+    MENU LABEL Install CentOS 7.0 x86_64 Minimal Rescue
+    KERNEL images/vmlinuz
+    APPEND initrd=images/initrd.img ramdisk_size=100000 ip=dhcp inst.repo=ftp://{{ansible_default_ipv4.address}}/pub rescuetimeout 100
+default menu.c32
+

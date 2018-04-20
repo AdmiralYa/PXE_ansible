@@ -1,0 +1,79 @@
+- hosts: c7
+  remote_user: root
+  roles:
+    - pxe
+  tasks:
+
+  - set_fact:
+      start_pool: 192.168.142.200
+      end_pool: 192.168.142.225
+
+  - name: Install everything
+    yum:
+      name: "{{item}}"
+      state: latest
+    with_items: "{{pxeserver_pkgs}}"
+
+
+  - name: DHCP
+    template:
+      src: roles/pxe/files/dhcpd.conf
+      dest: /etc/dhcp/dhcpd.conf
+    tags: pxeserver
+
+  - name: tftp
+    copy:
+      src: roles/pxe/files/tftp.conf
+      dest: /etc/xinetd.d/tftp
+    tags: pxeserver
+
+  - name: Ensure tftpboot dir exists
+    file: path=/tftpboot/pxelinux.cfg/  state=directory mode=0777
+
+  - name: copy ISO 
+    copy:
+      src: roles/pxe/files/CentOS-7-x86_64-Minimal-1708.iso
+      dest: /home/CentOS-7-x86_64-Minimal-1708.iso
+    tags: pxeserver
+
+  - name: copy default conf
+    template:
+      src: roles/pxe/files/default
+      dest: /tftpboot/pxelinux.cfg/default
+    tags: pxeserver
+
+  - name: Copy nginx template
+    template:
+      src: roles/pxe/files/nginx.conf
+      dest: /etc/nginx/nginx.conf
+    tags: pxeserver
+  - name: copy all menu files
+    copy:
+      src: "roles/pxe/files/menu/{{item}}"
+      dest: /tftpboot/
+    with_items:  "{{pxeserver_confs}}"
+    tags: pxeserver
+
+  - name: Ensure images dir exists
+    file: path=/tftpboot/images/  state=directory
+
+  - name: kernel and initrd
+    copy:
+      src: "roles/pxe/files/kernel/{{item}}"
+      dest: /tftpboot/images/{{item}} 
+    with_items:  "{{pxeserver_kernel}}"
+    tags: pxeserver
+
+  - name: Mount ISO
+    mount:
+      path: /var/ftp/pub
+      src: /home/CentOS-7-x86_64-Minimal-1708.iso
+      fstype: iso9660
+      state: mounted
+
+  - name: start services
+    service:
+      name: "{{item}}"
+      state: started
+    ignore_errors: True
+    with_items: "{{pxeserver_services}}"

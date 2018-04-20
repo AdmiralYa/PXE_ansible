@@ -1,0 +1,17 @@
+- hosts: c7
+  remote_user: root
+  vars:
+    dhcp_subnets: 
+      - ip: 192.168.142.50
+        netmask: 255.255.255.0
+    pxeserver_ip: 192.168.142.1
+    start_pool: 192.168.142.200
+    end_pool: 192.168.142.220
+    pxeserver_images:
+      - name: centos7
+        default: true
+        kernel_url: /tftpboot/images/centosx/vmlinuz
+        initrd_url: /tftpboot/images/centosx/initrd.img
+        label: CentOs7
+  roles:
+    - pxeserver

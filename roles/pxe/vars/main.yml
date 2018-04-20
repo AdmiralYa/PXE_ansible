@@ -1,0 +1,34 @@
+pxeserver_vars:
+  - start_pool: 192.168.142.200
+  - end_pool: 192.168.142.225
+
+pxeserver_kernel:
+  - vmlinuz
+  - initrd.img
+
+pxeserver_confs:
+  - chain.c32
+  - mboot.c32 
+  - memdisk 
+  - menu.c32  
+  - pxelinux.0
+
+pxeserver_files:
+  - /usr/share/syslinux/pxelinux.0
+  - /usr/share/syslinux/menu.c32
+
+pxeserver_pkgs:
+  - dhcp
+  - tftp-server
+  - syslinux 
+  - vsftpd 
+  - xinetd 
+  - wget
+  - nginx
+
+pxeserver_services:
+  - dhcpd
+  - tftp
+  - vsftpd
+  - xinetd
+  - nginx
